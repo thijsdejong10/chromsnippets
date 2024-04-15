@@ -5,7 +5,7 @@ The power here is that is should be more flexible and adaptable to changes in da
 Functions revolve around simple long form pandas dataframes as in and output.
 
 ## Installation
-Nothing fancy yet, clone this repository and install whatever packages your system screams at you for not having (rainbow-api being the only non standard one)
+Clone the repository in a convenient location, change into the top directory of the repository and run `pip install -e .`
 
 ## Structure
  - `data_loader.py` Functions for loading data, currently supports just FID and MS data from agilent .D files

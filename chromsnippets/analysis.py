@@ -25,21 +25,23 @@ def chromatogram_extract_peaks(
 def series_extract_peaks(
     data: pd.DataFrame, groups: str | list[str] = "sample_name", y_axis: str = "time"
 ) -> pd.DataFrame:
+    # TODO: rounding
     peaks = data.groupby(groups).apply(chromatogram_extract_peaks, y_axis=y_axis)
-    peaks.reset_index(groups).reset_index(inplace=True, drop=True)
+    peaks = peaks.reset_index(groups).reset_index(drop=True)
     return peaks
 
 
 def bin_peaks(
     peaks: pd.DataFrame, threshold: float, y_axis: str = "time"
 ) -> tuple[pd.DataFrame, dict[float, float]]:
+    # TODO: rounding
     peaks.sort_values(by=y_axis, inplace=True)
     np.cumsum(peaks[y_axis].diff() > 1)
     diff = peaks[y_axis].diff().fillna(0)
     bins = (diff > threshold).cumsum()
-    bin_avg = peaks.groupby(bins)["vals"].transform("mean")
+    bin_avg = peaks.groupby(bins)[y_axis].transform("mean")
     peaks["bin_label"] = bin_avg
-    bin_mapping = dict(zip(bins.unique(), bin_avg))
+    bin_mapping = dict(zip(peaks[y_axis].values, bin_avg))
     return peaks, bin_mapping
 
 

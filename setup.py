@@ -1,13 +1,13 @@
 from setuptools import setup
 
 setup(
-    name="chromsnippet",
+    name="chromsnippets",
     version="0.0.0",
     author=["Thijs de Jong"],
-    packages=["chromsnippet"],
+    packages=["chromsnippets"],
     install_requires=[
         "rainbow-api >= 1.0.6",
-        "numpy >= 1.26.6",
+        "numpy >= 1.26.4",
         "scipy >= 1.12.0",
         "pandas >= 2.2.1",
         "matplotlib >= 3.8.3",
