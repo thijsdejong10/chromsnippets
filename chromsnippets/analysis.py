@@ -51,6 +51,18 @@ def series_extract_peaks(
     return peaks
 
 
+def normalize_to_is(data: pd.DataFrame, lower_bound: float, upper_bound: float):
+    data.intensity = (
+        data.groupby("sample_name")
+        .apply(
+            lambda x: x.intensity
+            / x[x.time.between(lower_bound, upper_bound)].intensity.max(),
+            include_groups=True,
+        )
+        .values
+    )
+    return data
+
 def bin_peaks(
     peaks: pd.DataFrame, threshold: float, y_axis: str = "time"
 ) -> tuple[pd.DataFrame, dict[float, float]]:
