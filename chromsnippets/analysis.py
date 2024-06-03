@@ -1,21 +1,31 @@
 import pandas as pd
 from scipy.signal import find_peaks
 import numpy as np
+from scipy.sparse import find
+import seaborn as sns
+import matplotlib.pyplot as plt
+from lmfit.models import GaussianModel
+from lmfit import Model
+from typing import Callable
 
 
 def chromatogram_extract_peaks(
-    data_group: pd.DataFrame, find_peaks_kwargs: dict = dict(), y_axis: str = "time"
+    data_group: pd.DataFrame,
+    find_peaks_kwargs: dict = dict(),
+    x_axis: str = "time",
+    y_axis: str = "intensity",
+    decimals: int = 2,
 ) -> pd.DataFrame:
     """
     Extract peaks from a single chromatogram or trace and return them as a peak table.
     Designed to also be usable in a grouby call.
     """
-    idx, properties = find_peaks(data_group.intensity, **find_peaks_kwargs)
+    idx, properties = find_peaks(data_group[y_axis], **find_peaks_kwargs)
     peaks = pd.DataFrame(
         {
             "indices": idx,
-            "intensity": data_group.intensity.iloc[idx],
-            y_axis: data_group[y_axis].iloc[idx],
+            "intensity": data_group[y_axis].iloc[idx],
+            x_axis: data_group[x_axis].iloc[idx],
             **properties,
         }
     )
