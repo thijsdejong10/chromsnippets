@@ -64,16 +64,21 @@ def normalize_to_is(data: pd.DataFrame, lower_bound: float, upper_bound: float):
     return data
 
 def bin_peaks(
-    peaks: pd.DataFrame, threshold: float, y_axis: str = "time"
+    peaks: pd.DataFrame,
+    threshold: float,
+    bin_axis: str = "time",
+    return_label: str = "bin_label",
+    plot: bool = False,
 ) -> tuple[pd.DataFrame, dict[float, float]]:
     # TODO: rounding
-    peaks.sort_values(by=y_axis, inplace=True)
-    np.cumsum(peaks[y_axis].diff() > 1)
-    diff = peaks[y_axis].diff().fillna(0)
+    peaks.sort_values(by=bin_axis, inplace=True)
+    np.cumsum(peaks[bin_axis].diff() > 1)
+    diff = peaks[bin_axis].diff().fillna(0)
     bins = (diff > threshold).cumsum()
-    bin_avg = peaks.groupby(bins)[y_axis].transform("mean")
-    peaks["bin_label"] = bin_avg
-    bin_mapping = dict(zip(peaks[y_axis].values, bin_avg))
+    bin_avg = peaks.groupby(bins)[bin_axis].transform("mean")
+    peaks[return_label] = bin_avg
+    bin_mapping = dict(zip(peaks[bin_axis].values, bin_avg))
+    peaks.sort_index(inplace=True)
     return peaks, bin_mapping
 
 
