@@ -75,13 +75,22 @@ def load_folder_fid(
 def load_folder_ms(
     data_directory: Path,
     prec: int = 1,
+    parrallel: bool = True,
+    read_cache: bool = True,
 ) -> pd.DataFrame:
-    files = data_directory.glob("*.D")
-    files = [f.__str__() for f in files]
-    pool = multiprocessing.Pool()
-    # rb_directories = map(rb.read,files)
-    rb_directories = pool.map(partial(rb.read, prec=prec), files)
-    ms_data = pd.concat(pool.map(load_ms, rb_directories))
-    ms_data.reset_index(drop=True, inplace=True)
-    ms_data["sample"] = ms_data["sample"].astype("category")
+    parquet_path = data_directory / f"{data_directory.stem}_mass_data.parquet"
+    if read_cache and parquet_path.is_file():
+        return pd.read_parquet(parquet_path)
+    else:
+        files = data_directory.glob("*.D")
+        files = [f.__str__() for f in files]
+        rb_directories = map(partial(rb.read, prec=prec), files)
+        if parrallel:
+            pool = multiprocessing.Pool()
+            ms_data = pd.concat(pool.map(load_ms, rb_directories))
+        else:
+            ms_data = pd.concat(map(load_ms, rb_directories))
+        ms_data.reset_index(drop=True, inplace=True)
+        ms_data["sample_name"] = ms_data["sample_name"].astype("category")
+        ms_data.to_parquet(parquet_path)
     return ms_data
