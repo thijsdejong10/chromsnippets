@@ -21,7 +21,7 @@ def load_fid(
     fid_data = directory.by_detector["FID"][0]
     fid_df = pd.DataFrame(
         {
-            "sample": directory.name.split(".")[0],
+            "sample_name": directory.name.split(".")[0],
             "time": fid_data.xlabels,
             "intensity": fid_data.data.reshape(-1),
         }
@@ -43,7 +43,7 @@ def load_ms(directory: rb.DataDirectory) -> pd.DataFrame:
     ms_data = directory.by_detector["MS"][0]
     ms_df = pd.DataFrame(
         {
-            "sample": directory.name.split(".")[0],
+            "sample_name": directory.name.split(".")[0],
             "time": np.repeat(ms_data.xlabels, len(ms_data.ylabels)),
             "mz": np.tile(ms_data.ylabels, len(ms_data.xlabels)),
             "intensity": ms_data.data.flatten(),
