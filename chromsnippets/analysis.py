@@ -82,5 +82,24 @@ def bin_peaks(
     return peaks, bin_mapping
 
 
+def deconvolute_peaks(
+    data: pd.DataFrame,
+    y: str = "intensity",
+    x: str = "time",
+    number_of_peaks: int = 1,
+    fit_parameters: dict[str, float | dict[str, float]] = dict(),
+    baseline: Model = Model(lambda x, baseline: x + baseline, prefix="bl_"),
+):
+    """
+    Fit parameters should be a dictionary that is valid as an in put to the gaussian model,
+    either {"g1_center":500}, or {"g1_center":{"value":100,"min":2}}
+    """
+    model = baseline
+    for i in range(1, number_of_peaks + 1):
+        model += GaussianModel(prefix=f"g{i}_")
+    params = model.make_params(**fit_parameters)
+    result = model.fit(data[y], params, x=data[x])
+
+
 def assign_peaks(peaks: pd.DataFrame, assignments: pd.DataFrame) -> pd.DataFrame:
     return peaks
