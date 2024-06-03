@@ -60,15 +60,21 @@ def load_ms(directory: rb.DataDirectory) -> pd.DataFrame:
 def load_folder_fid(
     data_directory: Path,
     load_fid_kwargs: dict = dict(),
+    parrallel: bool = True,
 ) -> pd.DataFrame:
     files = data_directory.glob("*.D")
     files = [f.__str__() for f in files]
-    pool = multiprocessing.Pool()
     # rb_directories = map(rb.read,files)
-    rb_directories = pool.map(partial(rb.read), files)
-    fid_data = pd.concat(pool.map(partial(load_fid, **load_fid_kwargs), rb_directories))
+    rb_directories = map(partial(rb.read), files)
+    if parrallel:
+        pool = multiprocessing.Pool()
+        fid_data = pd.concat(
+            pool.map(partial(load_fid, **load_fid_kwargs), rb_directories)
+        )
+    else:
+        fid_data = pd.concat(map(partial(load_fid, **load_fid_kwargs), rb_directories))
     fid_data.reset_index(drop=True, inplace=True)
-    fid_data["sample"] = fid_data["sample"].astype("category")
+    fid_data["sample_name"] = fid_data["sample_name"].astype("category")
     return fid_data
 
 
