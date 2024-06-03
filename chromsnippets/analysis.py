@@ -33,10 +33,20 @@ def chromatogram_extract_peaks(
 
 
 def series_extract_peaks(
-    data: pd.DataFrame, groups: str | list[str] = "sample_name", y_axis: str = "time"
+    data: pd.DataFrame,
+    groups: str | list[str] = "sample_name",
+    find_peaks_kwargs: dict = dict(),
+    x_axis: str = "time",
+    y_axis: str = "intensity",
 ) -> pd.DataFrame:
     # TODO: rounding
-    peaks = data.groupby(groups).apply(chromatogram_extract_peaks, y_axis=y_axis)
+    peaks = data.groupby(groups).apply(
+        chromatogram_extract_peaks,
+        find_peaks_kwargs=find_peaks_kwargs,
+        y_axis=y_axis,
+        x_axis=x_axis,
+        include_groups=True,
+    )
     peaks = peaks.reset_index(groups).reset_index(drop=True)
     return peaks
 
